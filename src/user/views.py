@@ -4,6 +4,10 @@ from django.views import View
 from django.http import JsonResponse
 from django.conf import settings
 
+from rest_framework.generics import ListCreateAPIView
+
+from .serializers import UserSerializer
+
 import jwt
 
 from user.models import User
@@ -33,3 +37,8 @@ class LoginView(View):
             return JsonResponse({'access_token': token.decode('utf-8')}, status=200)
         except User.DoesNotExist:
             return JsonResponse({'massage': 'can not find user'}, status=404)
+
+
+class UserDRFCreateView(ListCreateAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.filter()

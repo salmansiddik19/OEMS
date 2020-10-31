@@ -1,1 +1,1 @@
-from course.views.admin.views import AdminCourseView, AdminDRFCourseView
+from course.views.admin.views import AdminDRFCourseView
