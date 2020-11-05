@@ -77,7 +77,7 @@ class TeacherCreateView(View):
             return JsonResponse({'data': self._serializer(user)}, status=201)
         except IntegrityError as e:
             print(e)
-            return JsonResponse({'massage': f'cannot create course. reason : {e}'}, status=400)
+            return JsonResponse({'massage': f'cannot create teacher. reason : {e}'}, status=400)
 
 
 class StudentCreateView(View):
@@ -111,4 +111,4 @@ class StudentCreateView(View):
             return JsonResponse({'data': self._serializer(user)}, status=201)
         except IntegrityError as e:
             print(e)
-            return JsonResponse({'massage': f'cannot create course. reason : {e}'}, status=400)
+            return JsonResponse({'massage': f'cannot create student. reason : {e}'}, status=400)
