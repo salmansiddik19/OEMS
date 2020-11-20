@@ -6,14 +6,24 @@ from .managers import ELearningUserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    class CategoryChoices(models.TextChoices):
+        TEACHER = 'teacher', 'teacher'
+        STUDENT = 'student', 'student'
+
+    # class StatusChoices(models.TextChoices):
+    #     ACTIVE = 'active', 'active'
+    #     INACTIVE = 'inactive', 'inactive'
+
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     username = models.CharField(max_length=255, unique=True)
     email = models.CharField(max_length=255, unique=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    is_teacher = models.BooleanField(default=False)
-    is_student = models.BooleanField(default=False)
+    category = models.CharField(
+        max_length=10, choices=CategoryChoices.choices, default=CategoryChoices.STUDENT)
+    # status = models.CharField(
+    #     max_length=10, choices=StatusChoices.choices, default=StatusChoices.INACTIVE)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
