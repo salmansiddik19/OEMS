@@ -10,9 +10,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         TEACHER = 'teacher', 'teacher'
         STUDENT = 'student', 'student'
 
-    # class StatusChoices(models.TextChoices):
-    #     ACTIVE = 'active', 'active'
-    #     INACTIVE = 'inactive', 'inactive'
+    class StatusChoices(models.TextChoices):
+        ACTIVE = 'active', 'active'
+        INACTIVE = 'inactive', 'inactive'
 
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
@@ -22,8 +22,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     category = models.CharField(
         max_length=10, choices=CategoryChoices.choices, default=CategoryChoices.STUDENT)
-    # status = models.CharField(
-    #     max_length=10, choices=StatusChoices.choices, default=StatusChoices.INACTIVE)
+    status = models.CharField(
+        max_length=10, choices=StatusChoices.choices, default=StatusChoices.INACTIVE)
+    meta = models.JSONField(default=dict)
 
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email']

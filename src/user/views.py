@@ -5,8 +5,13 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.contrib.auth.models import Group
 
-from rest_framework.generics import ListAPIView, ListCreateAPIView
-from rest_framework.permissions import IsAdminUser
+from rest_framework.generics import (
+    ListAPIView,
+    ListCreateAPIView,
+    UpdateAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 
@@ -19,7 +24,7 @@ from user.models import User
 
 class LoginView(View):
     @staticmethod
-    def _serializer(user):
+    def _serializer(user: User):
         return {
             'id': user.id,
             'username': user.username,
@@ -49,6 +54,23 @@ class UserListView(ListAPIView):
     permission_classes = [IsAdminUser, ]
 
 
+class ProfileListView(ListAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def get_queryset(self):
+        return User.objects.filter(username=self.request.user.username)
+
+
+class ProfileUpdateAPIView(UpdateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, ]
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        return User.objects.filter(username=self.request.user.username)
+
+
 class UserCreateListAPIView(ListCreateAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
@@ -62,7 +84,9 @@ class UserCreateListAPIView(ListCreateAPIView):
             email=body.get('email'),
             password=body.get('password'),
             category=body.get('category'),
+            status=body.get('status'),
         )
+        user.set_password(user.password)
         user.save()
         if body['category'] == 'teacher':
             groups = Group.objects.get(name='Teacher')
@@ -73,3 +97,17 @@ class UserCreateListAPIView(ListCreateAPIView):
             groups.user_set.add(user)
             groups.save()
         return Response(data=self.get_serializer(user).data, status=status.HTTP_200_OK)
+
+
+class UserGetUpdateRetrieveDestroyAPIView(RetrieveUpdateDestroyAPIView):
+    serializer_class = UserSerializer
+    queryset = User.objects.filter()
+    permission_classes = [IsAdminUser, ]
+    lookup_field = 'pk'
+
+    def destroy(self, request, *args, **kwargs):
+        obj: User = self.get_object()
+        obj.is_active = False
+        obj.status = 'inactive'
+        obj.save()
+        return Response(data=self.get_serializer(obj).data, status=status.HTTP_200_OK)
